@@ -95,13 +95,10 @@
                   class="sort-ind"></span></button></th>
             <th class="p-3"><button data-key="starType" class="font-semibold">Star type<span
                   class="sort-ind"></span></button></th>
-            <th class="p-3"><button data-key="numStars" class="font-semibold"># Stars<span
-                  class="sort-ind"></span></button></th>
-            <th class="p-3"><button data-key="exo" class="font-semibold">Exoplanets?<span
-                  class="sort-ind"></span></button></th>
-            <th class="p-3"><button data-key="exoCount" class="font-semibold"># Planets<span
-                  class="sort-ind"></span></button></th>
-            <th class="p-3"><button data-key="notes" class="font-semibold">Notes<span class="sort-ind"></span></button>
+            <!-- Exoplanets column removed; planet details are shown in the Notes popup -->
+            <!-- # Planets column removed per user request; planet info will be moved into Notes popup -->
+            <th class="p-3" style="min-width:20rem;"><button data-key="notes" class="font-semibold">Notes<span
+                  class="sort-ind"></span></button>
             </th>
           </tr>
         </thead>
@@ -252,6 +249,8 @@
         // Only fill in when missing/placeholder
         s.starType = mostMassiveType(s)
       }
+      // Ensure exoCount is a numeric field used for the "Exoplanets (confirmed)" column.
+      if (!Number.isFinite(s.exoCount)) s.exoCount = s.exo ? 1 : 0
       // otherwise keep the author-provided `starType` exactly as given
     })
 
@@ -329,7 +328,8 @@
             let titleAttr = ''
             if (compName || compSpec) titleAttr = ' title="' + (compName ? compName + ' — ' : '') + compSpec + '"'
             dots += '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + (r * 2 + 4) + ' ' + (r * 2 + 4) + '" xmlns="http://www.w3.org/2000/svg" class="rounded-full"' + titleAttr + '>'
-            dots += '<circle cx="' + (r + 2) + '" cy="' + (r + 2) + '" r="' + r + '" fill="' + color + '" stroke="#222" stroke-opacity="0.12"/>'
+            // Slightly stronger outline so pale fills (A/B/F) remain visible on a light background
+            dots += '<circle cx="' + (r + 2) + '" cy="' + (r + 2) + '" r="' + r + '" fill="' + color + '" stroke="#0f172a" stroke-opacity="0.35" stroke-width="0.8"/>'
             dots += '</svg>'
             if (i < count - 1) dots += '<span class="mx-0.5" aria-hidden></span>'
           }
@@ -351,19 +351,29 @@
           <td class="p-3 text-right">${formatNum(s.age)}</td>
           <td class="p-3">${s.spectral}</td>
           <td class="p-3">${s.starType}</td>
-          <td class="p-3">${formatBool(s.exo)}</td>
-          <td class="p-3 text-right">${s.exoCount}</td>
-          <td class="p-3">
+          <!-- Exoplanet count column removed; include planet info inside Notes popup below -->
+          <td class="p-3" style="min-width:20rem;">
             <div class="relative inline-block group" tabindex="0">
-              <span>${s.notes || ''}</span>
-              ${s.uncertainty && s.uncertainty.length ? (
-            '<span class="ml-2 text-amber-600 font-semibold" aria-hidden>⚠</span>' +
-            '<div class="absolute z-10 left-0 mt-2 w-72 p-3 rounded-lg bg-slate-800 text-white text-xs shadow-lg opacity-0 pointer-events-none transition-opacity duration-150 group-hover:opacity-100 group-hover:pointer-events-auto hover:opacity-100 hover:pointer-events-auto focus:opacity-100 focus:pointer-events-auto" role="dialog" aria-hidden="true">' +
-            '<div class="font-semibold">Uncertainty</div>' +
-            '<div class="mt-1">' + uncertaintyText(s) + '</div>' +
-            (s.sources ? ('<div class="mt-2 text-xxs text-slate-300"><a href="' + s.sources[0] + '" target="_blank" rel="noopener" class="underline">source</a></div>') : '') +
-            '</div>'
-          ) : ''}
+              <!-- notes preview (short) -->
+              ${(() => {
+            const full = (s.notes || '').toString()
+            // Append planet info into the full notes for visibility
+            let extras = ''
+            if (s.exoCount && Number(s.exoCount) > 0) extras += `Planets: ${s.exoCount}. `
+            else if (s.exo) extras += `Planets: yes. `
+            const preview = (full + ' ' + extras).trim().slice(0, 80)
+            const more = (full + ' ' + extras).trim()
+            // build popup content: notes + uncertainty + first source link if present
+            let popup = '<div class="font-semibold">Details</div>' + '<div class="mt-1 text-sm">' + (more || '—') + '</div>'
+            if (s.uncertainty && s.uncertainty.length) {
+              popup += '<div class="mt-2 font-semibold">Uncertainty</div><div class="mt-1 text-sm">' + uncertaintyText(s) + '</div>'
+            }
+            if (s.sources && s.sources.length) {
+              popup += '<div class="mt-2 text-xxs text-slate-300"><a href="' + s.sources[0] + '" target="_blank" rel="noopener" class="underline">source</a></div>'
+            }
+            return '<span class="text-sm text-slate-700">' + preview + (more.length > 80 ? '…' : '') + '</span>' +
+              '<div class="absolute z-10 left-0 mt-2 w-80 max-w-[90vw] p-3 rounded-lg bg-white text-slate-900 text-sm shadow-sm border border-slate-100 opacity-0 pointer-events-none transition-opacity duration-150 group-hover:opacity-100 group-hover:pointer-events-auto hover:opacity-100 hover:pointer-events-auto focus:opacity-100 focus:pointer-events-auto" role="dialog" aria-hidden="true">' + popup + '</div>'
+          })()}
             </div>
           </td>
         </tr>

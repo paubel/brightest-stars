@@ -69,9 +69,24 @@ const stars = [
     spectral: "G2 V",
     numStars: 3,
     starType: "Main sequence",
+    // Represent Alpha Centauri as a triple: the close binary AB (A: G2 V, B: K1 V)
+    // plus the distant but bound Proxima Centauri (C, a red dwarf). The UI will
+    // render one dot per component using the `components` array. We keep numeric
+    // astrophysical values unchanged and only add provenance + notes about
+    // Proxima's planets so the dataset remains conservative.
+    components: [
+      { name: "A", spec: "G2 V", visualSize: 36 },
+      { name: "B", spec: "K1 V", visualSize: 30 },
+      { name: "C (Proxima)", spec: "M5–M6 V", visualSize: 12 },
+    ],
     exo: true,
     exoCount: 1,
-    notes: "Part of Alpha Centauri system (Proxima b confirmed).",
+    sources: [
+      "https://en.wikipedia.org/wiki/Alpha_Centauri",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=alpha+centauri",
+    ],
+    notes:
+      "Triple system: Alpha Centauri A (G2 V) + B (K1 V) form the close binary AB; Proxima Centauri (α Cen C, M5–M6 V) is a distant, gravitationally bound red dwarf (Kervella et al. 2017). Proxima hosts confirmed planets (Proxima b and Proxima d); other candidate planets around A/B remain unconfirmed. See sources for details.",
   },
   {
     name: "Vega",
@@ -209,20 +224,32 @@ const stars = [
     constellation: "Centaurus",
     visibility: "Southern",
     mag: 0.61,
-    distance: 390,
+    distance: 361,
     lum: 50000,
     temp: 25000,
     radius: 8,
     mass: 10,
     age: 0.014,
     spectral: "B1 III",
-    /* Beta Centauri has multiple confirmed components; sources list multiple
-       spectroscopic/visual components. Set to 4 based on cataloged components. */
-    numStars: 4,
-    starType: "Blue giant",
+    /* Beta Centauri is a triple system: the close spectroscopic pair
+       β Cen Aa + Ab (both ~B1 III) and a wider visual companion β Cen B
+       (spectral type commonly listed as ~B1 V). Use a 3-component
+       `components` array so the UI renders three dots for Hadar. */
+    numStars: 3,
+    starType: "Blue giant (triple)",
+    sources: [
+      "https://en.wikipedia.org/wiki/Beta_Centauri",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Beta+Centauri",
+    ],
+    components: [
+      { name: "Aa", spec: "B1 III", visualSize: 18 },
+      { name: "Ab", spec: "B1 III", visualSize: 16 },
+      { name: "B", spec: "B1 V", visualSize: 14 },
+    ],
     exo: false,
     exoCount: 0,
-    notes: "Massive triple system.",
+    notes:
+      "Triple system: Aa+Ab (spectroscopic B1 III pair) + B (visual, B1 V). Sources: Wikipedia, SIMBAD.",
   },
   {
     name: "Altair",
@@ -348,9 +375,18 @@ const stars = [
     spectral: "A3 V",
     numStars: 3,
     starType: "Main sequence",
-    exo: true,
-    exoCount: 1,
-    notes: "Famous debris ring; planet candidate reported.",
+    // Represent the system components so the UI renders three illustrative dots
+    // (A = primary A3 V; B = TW Piscis Austrini, K-type; C = LP 876-10, M-type).
+    // These component specs are illustrative to control the on-page colors/sizes.
+    components: [
+      { name: "A", spec: "A3 V", visualSize: 36 },
+      { name: "B", spec: "K4 V", visualSize: 14 },
+      { name: "C", spec: "M4 V", visualSize: 12 },
+    ],
+    // There is no confirmed exoplanet around Fomalhaut in this dataset.
+    exo: false,
+    exoCount: 0,
+    notes: "Famous debris ring; expanding dust cloud (no confirmed exoplanet).",
   },
   {
     name: "Deneb",
@@ -437,6 +473,12 @@ const stars = [
     spectral: "B2 IV",
     numStars: 3,
     starType: "Blue subgiant",
+    // Illustrative per-component breakdown so the UI renders three circles
+    components: [
+      { name: "A", spec: "B2 IV", visualSize: 20 },
+      { name: "B", spec: "B3 V", visualSize: 14 },
+      { name: "C", spec: "B5 V", visualSize: 12 },
+    ],
     exo: false,
     exoCount: 0,
     notes: "Multiple hot system.",
@@ -537,13 +579,20 @@ const stars = [
     mass: 40,
     age: 0.005,
     spectral: "B0 Ia",
-    numStars: 3,
+    // Alnilam is generally treated as a single blue supergiant (B0 Ia).
+    // Earlier dataset incorrectly listed multiple components; update to a
+    // conservative single-star representation and keep distance uncertainty.
+    numStars: 1,
     starType: "Blue supergiant",
     uncertainty: [1], // distance/parallax disagreement in literature
-    sources: ["https://en.wikipedia.org/wiki/Alnilam"],
+    sources: [
+      "https://en.wikipedia.org/wiki/Alnilam",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Epsilon+Orionis",
+    ],
     exo: false,
     exoCount: 0,
-    notes: "Middle star of Orion's Belt.",
+    notes:
+      "Middle star of Orion's Belt. Treated as a single blue supergiant in major catalogs; distance estimates vary between sources.",
   },
   {
     name: "Alnitak",
@@ -559,11 +608,24 @@ const stars = [
     spectral: "O9.7 Ib",
     numStars: 3,
     starType: "Blue supergiant",
-    uncertainty: [1, 2], // distance disagreement; multiple components
-    sources: ["https://en.wikipedia.org/wiki/Alnitak"],
+    // Alnitak is a hierarchical triple: Alnitak Aa (primary, O9.5–O9.7 Iab)
+    // with a close companion Ab, plus a wider visual companion B. Add
+    // per-component entries so the UI renders three dots and include
+    // authoritative sources.
+    uncertainty: [1, 2], // distance disagreement; multiplicity details
+    sources: [
+      "https://en.wikipedia.org/wiki/Alnitak",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Zeta+Orionis",
+    ],
+    components: [
+      { name: "Aa", spec: "O9.5 Iab", visualSize: 40 },
+      { name: "Ab", spec: "B1 IV", visualSize: 22 },
+      { name: "B", spec: "B0–B1 III", visualSize: 18 },
+    ],
     exo: false,
     exoCount: 0,
-    notes: "Left-most of Orion's Belt.",
+    notes:
+      "Left-most of Orion's Belt. Alnitak A is itself a close pair (Aa+Ab) with a wider visual B companion; some faint line-of-sight stars are not physically associated.",
   },
   {
     name: "Mintaka",
@@ -577,13 +639,32 @@ const stars = [
     mass: 30,
     age: 0.006,
     spectral: "O9.5 II",
-    numStars: 3,
-    starType: "Blue giant",
-    uncertainty: [1], // Hipparcos vs cluster/Gaia distance discrepancies
-    sources: ["https://en.wikipedia.org/wiki/Mintaka"],
+    // Mintaka (δ Ori) is a complex hierarchical system. Recent references
+    // describe the system as comprising the close eclipsing pair Aa1+Aa2,
+    // a resolved Ab, and additional components C (which itself is a close
+    // binary) and a B component whose physical association is debated.
+    // Represent the commonly cited components conservatively and flag
+    // uncertain associations.
+    numStars: 5,
+    starType: "Multiple (hierarchy)",
+    uncertainty: [1, 2], // distance discrepancies; some companions' association disputed
+    sources: [
+      "https://en.wikipedia.org/wiki/Mintaka",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Delta+Orionis",
+    ],
+    components: [
+      { name: "Aa1", spec: "O9.5 II", visualSize: 40 },
+      { name: "Aa2", spec: "B1 V", visualSize: 30 },
+      { name: "Ab", spec: "B0 IV", visualSize: 22 },
+      // Delta Ori C is often listed as a close binary (Ca+Cb); represent
+      // it here as two components so the UI renders the multiplicity.
+      { name: "Ca", spec: "B-type", visualSize: 16 },
+      { name: "Cb", spec: "B-type", visualSize: 14 },
+    ],
     exo: false,
     exoCount: 0,
-    notes: "Right-most of Orion's Belt.",
+    notes:
+      "Right-most of Orion's Belt. Hierarchical multiple: Aa1+Aa2 (eclipsing), Ab (resolved), and C (itself a close pair); the B component's physical association is debated — see sources.",
   },
   {
     name: "Saiph",
@@ -636,9 +717,23 @@ const stars = [
     spectral: "A2 V",
     numStars: 4,
     starType: "Multiple (quadruple)",
+    // Mizar is a well-known quadruple: ζ1 (Mizar A) = Aa+Ab (both A2Vp)
+    // and ζ2 (Mizar B) = Ba+Bb (Ba shows Am characteristics; Bb is faint).
+    // Add per-component entries so the UI renders four colored dots.
+    sources: [
+      "https://en.wikipedia.org/wiki/Mizar",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Mizar",
+    ],
+    components: [
+      { name: "Aa", spec: "A2Vp", visualSize: 30 },
+      { name: "Ab", spec: "A2Vp", visualSize: 30 },
+      { name: "Ba", spec: "kA1h(eA)mA7IV-V", visualSize: 26 },
+      { name: "Bb", spec: "", visualSize: 12 },
+    ],
     exo: false,
     exoCount: 0,
-    notes: "Part of the Big Dipper; multiple system.",
+    notes:
+      "Quadruple system: Mizar Aa+Ab (A2Vp) and Ba+Bb (Ba: Am, Bb: faint companion). Sources: Wikipedia, SIMBAD.",
   },
   {
     name: "Alioth",
@@ -673,7 +768,29 @@ const stars = [
     starType: "Giant",
     exo: false,
     exoCount: 0,
-    notes: "One of the pointer stars to Polaris.",
+    // Conservative per-component breakdown for the Dubhe system (α UMa).
+    // Literature identifies the bright pair α UMa A (K0 III) + α UMa B (A-type
+    // main-sequence) with a ~44.45 yr orbit, plus a widely-separated F-type
+    // spectroscopic pair (HD 95638) sometimes catalogued as a companion. The
+    // wide pair's membership is debated (~40% chance of being unrelated), so
+    // include an `uncertainty` flag and `sources` for verification.
+    uncertainty: [2], // 2 = multiplicity/association disputed
+    sources: [
+      "https://en.wikipedia.org/wiki/Dubhe",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=alpha+ursae+majoris",
+    ],
+    components: [
+      { name: "A", spec: "K0 III", visualSize: 36 },
+      { name: "B", spec: "A5 V", visualSize: 18 },
+      // The following represent the widely-separated F-type pair (HD 95638),
+      // sometimes treated as α UMa C (itself a short-period spectroscopic
+      // binary). We model them as Ca/Cb for the UI so the system renders as
+      // a quadruple; membership is deliberately flagged as uncertain.
+      { name: "Ca", spec: "F8 V", visualSize: 12 },
+      { name: "Cb", spec: "F8 V", visualSize: 12 },
+    ],
+    notes:
+      "Multiple system: A (K0 III) + B (A-type) with ~44.45 yr orbit; a distant F-type spectroscopic pair (HD 95638) is sometimes catalogued as a companion — membership uncertain. Sources: Wikipedia, SIMBAD.",
   },
   {
     name: "Merak",
