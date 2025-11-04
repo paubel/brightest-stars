@@ -239,6 +239,29 @@
       }
     }
 
+    // Return a simple luminosity/class multiplier to make pictorial dots
+    // reflect relative sizes: supergiants >> giants > main-sequence > dwarfs.
+    // This is intentionally heuristic and conservative — it's only used to
+    // make the dots look reasonable relative to one another (not to scale).
+    function luminosityMultiplier(specStr, starTypeStr) {
+      const spec = (specStr || '').toString().toUpperCase()
+      const st = (starTypeStr || '').toString().toUpperCase()
+      // Make the multipliers more conservative so circles remain pictorial
+      // and don't dominate the layout. We'll rely primarily on these
+      // modest factors and apply a separate, compressed radius-based
+      // adjustment where needed.
+      if (/SUPERGIANT|RED SUPERGIANT|YELLOW SUPERGIANT/i.test(st) || /IAB|IA|IB|SUPERGIANT/.test(spec)) return 2.0
+      if (/BRIGHT GIANT|BRIGHT-GIANT/i.test(st) || /\bII\b/.test(spec)) return 1.8
+      if (/GIANT/i.test(st) || /\bIII\b/.test(spec)) return 1.4
+      if (/SUBGIANT/i.test(st) || /\bIV\b/.test(spec)) return 1.15
+      if (/WHITE\s*-?DWARF/i.test(st) || /DA|DB|DQ|DC|DZ|D[A-Z]/.test(spec)) return 0.6
+      // Main-sequence / dwarfs / generic
+      if (/MAIN|V\b/.test(st) || /\bV\b/.test(spec)) return 1.0
+      // Fallback: slightly upscale for luminous spectral letters (O/B)
+      if (/O|B/.test(spec)) return 1.2
+      return 1.0
+    }
+
     // Ensure each star object has a numeric `numStars` property.
     // Only compute/assign `starType` when the data does not already provide one.
     // This preserves explicit/descriptive values written in `stars-data.js` (e.g. "Multiple (sextuple)").
@@ -288,14 +311,20 @@
     function render() {
       const rows = currentRows()
       tbody.innerHTML = rows.map(s => {
-        // For the user's test: show spectral-colored dots in the first column
-        // for any star that provides a `components` array. This enables Acrux and
-        // Castor (and any future systems) to render one dot per component.
-        const showDot = Array.isArray(s.components) && s.components.length > 0
+        // Show spectral-colored dots in the first column for either:
+        //  - systems that provide a `components` array (one dot per component), or
+        //  - single-star systems (numStars === 1) even when `components` is absent.
+        // This avoids mass-editing `stars-data.js` while ensuring single stars
+        // display a representative colored dot.
+        const hasComponents = Array.isArray(s.components) && s.components.length > 0
+        const isSingle = displayNumStars(s) === 1
+        const showDot = hasComponents || isSingle
         let dotHtml = ''
         if (showDot) {
-          const comps = Array.isArray(s.components) && s.components.length ? s.components : null
-          const count = comps ? comps.length : (displayNumStars(s) || 1)
+          const comps = hasComponents ? s.components : null
+          // If components exist, render one dot per component. Otherwise,
+          // render a single dot for the lone star using the system spectral type.
+          const count = comps ? comps.length : 1
           let dots = ''
           // Special-case: for Castor we want all component dots to be small
           // and uniform (the user prefers six small stars). Detect by name.
@@ -320,9 +349,35 @@
             const color = colorForSpectral(letter)
             // Determine size: prefer explicit visualSize, else for Castor fallback
             // to small uniform size if desired, otherwise use spectral size.
-            let size = forcedSize != null ? forcedSize : (isCastor ? 10 : sizeForSpectral(letter))
-            // If the provided visualSize is 0 or falsy, fall back to spectral size
-            if (!size) size = sizeForSpectral(letter)
+            let baseSize = forcedSize != null ? forcedSize : (isCastor ? 10 : sizeForSpectral(letter))
+            if (!baseSize) baseSize = sizeForSpectral(letter)
+            // Apply a luminosity/class multiplier so supergiants and giants
+            // get visibly larger dots than main-sequence stars of the same
+            // spectral letter. Use component-spec when available, else system
+            // spectral/starType as fallback. To keep representations pictorial
+            // (not to-scale), blend this spectral/multiplicity-based size with
+            // a compressed radius-derived score so very large physical radii
+            // (e.g., Betelgeuse) influence the dot but do not explode it.
+            const compSpecForMult = (compSpec && compSpec.toString().trim()) || s.spectral || s.starType || ''
+            const mult = luminosityMultiplier(compSpecForMult, s.starType)
+
+            // Base pictorial size derived from spectral letter and luminosity class
+            const pictorial = baseSize * mult
+
+            // Compressed radius score: uses the system radius (most components
+            // don't list individual radii). We compress via log10 and map to a
+            // modest range so huge radii don't create gigantic circles.
+            const sysRadius = Number(s.radius) || 1
+            const cappedRadius = Math.min(sysRadius, 3000) // guard against absurd values
+            const radiusScore = 8 + 9 * Math.log10(Math.max(1, cappedRadius)) // typical -> 8..~40
+
+            // Blend pictorial and radius scores: weight radius somewhat higher
+            // so truly enormous stars are recognizable, but keep everything
+            // within a conservative visual range.
+            let size = Math.round(0.4 * pictorial + 0.6 * radiusScore)
+
+            // Clamp to reasonable visual bounds to avoid layout issues.
+            size = Math.min(Math.max(size, 8), 44)
             const r = Math.max(2, Math.round(size / 2) - 1)
             // Add title for accessibility / quick tooltip with component name/spec
             let titleAttr = ''

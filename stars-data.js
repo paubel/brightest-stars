@@ -19,7 +19,19 @@ const stars = [
     starType: "Main sequence",
     exo: false,
     exoCount: 0,
-    notes: "Brightest night star; binary with white dwarf Sirius B.",
+    // Sirius is a well-studied binary: bright main-sequence Sirius A and
+    // the white-dwarf companion Sirius B. Keep numeric fields unchanged
+    // and add conservative per-component rendering + provenance.
+    components: [
+      { name: "A", spec: "A1 V", visualSize: 38 },
+      { name: "B", spec: "DA2 (white dwarf)", visualSize: 12 },
+    ],
+    sources: [
+      "https://en.wikipedia.org/wiki/Sirius",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Sirius",
+    ],
+    notes:
+      "Binary system: Sirius A (A1 V) + Sirius B (white dwarf). Some historical claims of additional faint companions remain unconfirmed; see sources.",
   },
   {
     name: "Canopus",
@@ -36,7 +48,17 @@ const stars = [
     starType: "Supergiant",
     exo: false,
     exoCount: 0,
-    notes: "Second brightest star.",
+    // Canopus is generally treated as a single bright F-type supergiant.
+    // No well-established close stellar companions; a candidate wide
+    // common-proper-motion M-dwarf was reported (Mamajek 2014) at very
+    // large projected separation and is not considered a bound close
+    // companion. Keep numeric parameters unchanged and add provenance.
+    sources: [
+      "https://en.wikipedia.org/wiki/Canopus",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Canopus",
+    ],
+    notes:
+      "Bright F-type supergiant (Canopus). No confirmed close stellar companion; a candidate wide common-proper-motion M-dwarf has been reported but is at very large projected separation (see sources).",
   },
   {
     name: "Arcturus",
@@ -53,7 +75,18 @@ const stars = [
     starType: "Red giant",
     exo: false,
     exoCount: 0,
-    notes: "Orange giant; very old population.",
+    // Arcturus is commonly listed as a single K-type red giant, but a
+    // marginal Hipparcos astrometric detection and some radial-velocity
+    // studies have suggested a possible low-mass companion; results are
+    // inconclusive. We'll flag multiplicity as disputed (conservative)
+    // and add provenance rather than declaring a firm companion.
+    uncertainty: [2],
+    sources: [
+      "https://en.wikipedia.org/wiki/Arcturus",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Arcturus",
+    ],
+    notes:
+      "Bright K1.5 III red giant. Hipparcos astrometry gave a marginal companion detection and some radial-velocity studies have reported long-period signals; multiplicity remains inconclusive — see sources.",
   },
   {
     name: "Alpha Centauri",
@@ -103,7 +136,17 @@ const stars = [
     starType: "Main sequence",
     exo: false,
     exoCount: 0,
-    notes: "Debris disk; fast rotator.",
+    // Vega: bright A0V star with a well-studied debris disk and no
+    // confirmed planets. There are tentative planet/period signals in
+    // the literature (e.g., a 2.43-day candidate signal) but these are
+    // unconfirmed; flag as tentative and add provenance.
+    sources: [
+      "https://en.wikipedia.org/wiki/Vega",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Vega",
+    ],
+    uncertainty: [5],
+    notes:
+      "A0 V main-sequence star with a debris disk. Rapid rotator seen nearly pole-on. No confirmed planets; some tentative planet signals have been reported but remain unconfirmed (see sources). JWST observations show the disk to be exceptionally smooth (2024–2025 results).",
   },
   {
     name: "Capella",
@@ -180,7 +223,17 @@ const stars = [
     starType: "Subgiant",
     exo: false,
     exoCount: 0,
-    notes: "White dwarf companion (Procyon B).",
+    // Procyon is a nearby binary: Procyon A (F5 IV–V) + Procyon B (white dwarf).
+    components: [
+      { name: "A", spec: "F5 IV–V", visualSize: 34 },
+      { name: "B", spec: "DQZ (white dwarf)", visualSize: 12 },
+    ],
+    sources: [
+      "https://en.wikipedia.org/wiki/Procyon",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Procyon",
+    ],
+    notes:
+      "Binary system: Procyon A (F5 IV–V) and a faint white-dwarf companion Procyon B (DQZ). Orbital elements and white-dwarf parameters are well-studied (see sources).",
   },
   {
     name: "Achernar",
@@ -198,7 +251,19 @@ const stars = [
     starType: "Main sequence",
     exo: false,
     exoCount: 0,
-    notes: "Rapid rotator; oblate.",
+    // Achernar is a binary: the rapid-rotating Be primary (A, B6 Vep)
+    // and a close A-type companion (B, A0–A3 V). Add per-component
+    // entries for rendering and provenance; numeric fields unchanged.
+    components: [
+      { name: "A", spec: "B6 Vep", visualSize: 40 },
+      { name: "B", spec: "A1–A3 V", visualSize: 18 },
+    ],
+    sources: [
+      "https://en.wikipedia.org/wiki/Achernar",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Achernar",
+    ],
+    notes:
+      "Rapid rotator; oblate. Binary system (A + close A-type companion B) — see sources.",
   },
   {
     name: "Betelgeuse",
@@ -306,7 +371,20 @@ const stars = [
     starType: "Red giant",
     exo: false,
     exoCount: 0,
-    notes: "Orange giant; planet claim unconfirmed.",
+    // Aldebaran has a very faint reported companion (B) catalogued in
+    // double-star catalogs; there are also historic visual companions that
+    // proved to be optical. Surface a conservative A+B representation and
+    // keep the note about an unconfirmed planet claim.
+    components: [
+      { name: "A", spec: "K5 III", visualSize: 36 },
+      { name: "B", spec: "M2.5 V", visualSize: 12 },
+    ],
+    sources: [
+      "https://en.wikipedia.org/wiki/Aldebaran",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Aldebaran",
+    ],
+    notes:
+      "Orange giant; companion Aldebaran B (very faint, ~mag 13) is catalogued as part of the system; historic additional visual companions are mostly optical. Planet claim remains unconfirmed — see sources.",
   },
   {
     name: "Spica",
@@ -324,7 +402,19 @@ const stars = [
     starType: "Spectroscopic binary",
     exo: false,
     exoCount: 0,
-    notes: "Massive close pair.",
+    // Spica is a well-known close spectroscopic binary (B1III–IV + B2V).
+    // Add per-component entries and sources so UI shows the pair and we
+    // preserve provenance for the binary parameters.
+    components: [
+      { name: "A", spec: "B1 III–IV", visualSize: 36 },
+      { name: "B", spec: "B2 V", visualSize: 28 },
+    ],
+    sources: [
+      "https://en.wikipedia.org/wiki/Spica",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Spica",
+    ],
+    notes:
+      "Massive close spectroscopic binary (B1 III–IV + B2 V). Orbital period ~4.0145 d — see sources.",
   },
   {
     name: "Antares",
@@ -342,7 +432,21 @@ const stars = [
     starType: "Red supergiant",
     exo: false,
     exoCount: 0,
-    notes: "Rival of Mars; huge and cool.",
+    // Antares is a red supergiant primary with a hot, much fainter B-type
+    // companion (α Sco B). The system's orbit estimates vary; flag the
+    // multiplicity/orbit parameters as somewhat uncertain while recording
+    // the components and sources.
+    components: [
+      { name: "A", spec: "M1.5 Iab (Red supergiant)", visualSize: 48 },
+      { name: "B", spec: "B2.5 V", visualSize: 22 },
+    ],
+    uncertainty: [2],
+    sources: [
+      "https://en.wikipedia.org/wiki/Antares",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Antares",
+    ],
+    notes:
+      "Red supergiant primary (α Sco A) with a hot, faint B-type companion (α Sco B). Orbit solutions have varied and are considered somewhat uncertain — see sources.",
   },
   {
     name: "Pollux",
@@ -457,7 +561,20 @@ const stars = [
     starType: "Blue giant",
     exo: false,
     exoCount: 0,
-    notes: "Was much brighter a few Myr ago.",
+    // Epsilon CMa (Adhara) is a reported visual binary: A (Adhara, the bright
+    // B2 II primary) and a faint B component (~+7.5 mag) at ~7.5–7.9".
+    // The pair is listed in WDS and common catalogs; record per-component
+    // rendering and provenance. Keep primary numeric parameters unchanged.
+    components: [
+      { name: "A (Adhara)", spec: "B2 II", visualSize: 40 },
+      { name: "B", spec: "~A/F (mag ~7.5)", visualSize: 12 },
+    ],
+    sources: [
+      "https://en.wikipedia.org/wiki/Epsilon_Canis_Majoris",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Epsilon+Canis+Majoris",
+    ],
+    notes:
+      "Binary system (Adhara = ε CMa A) with a faint visual companion ε CMa B (~mag 7.5) at ~7.5–7.9 arcsec. The IAU-approved proper name 'Adhara' refers to the primary (A). Some catalogues report slightly different distance estimates (Hipparcos/Gaia reductions); see sources.",
   },
   {
     name: "Shaula (Lambda Sco)",
@@ -842,7 +959,22 @@ const stars = [
     starType: "Cepheid/supergiant",
     exo: false,
     exoCount: 0,
-    notes: "North Star; Cepheid variable.",
+    // Polaris is a hierarchical triple: the Cepheid primary (Aa) with a
+    // close spectroscopic companion Ab, and a distant resolved companion B.
+    // Distance/parameter estimates have been debated in literature; flag
+    // distance uncertainty conservatively.
+    components: [
+      { name: "Aa", spec: "F7 Ib (Cepheid)", visualSize: 44 },
+      { name: "Ab", spec: "F6 V (spectroscopic)", visualSize: 16 },
+      { name: "B", spec: "F3 V (resolved)", visualSize: 18 },
+    ],
+    uncertainty: [1],
+    sources: [
+      "https://en.wikipedia.org/wiki/Polaris",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Polaris",
+    ],
+    notes:
+      "Triple system: Polaris Aa (Cepheid, F7 Ib) with close companion Ab (spectroscopic) and a distant resolved companion B. Distance and some parameter estimates have varied between studies; see sources.",
   },
   {
     name: "Denebola",
@@ -1000,7 +1132,20 @@ const stars = [
     starType: "Eclipsing binary (triple)",
     exo: false,
     exoCount: 0,
-    notes: "Famous eclipsing binary (Beta Persei).",
+    // Algol is a classic hierarchical triple: an eclipsing close pair (Aa1+Aa2)
+    // plus a more distant third component Ab. Add per-component entries
+    // so UI shows three dots and include provenance.
+    components: [
+      { name: "Aa1", spec: "B8 V", visualSize: 30 },
+      { name: "Aa2", spec: "K0 IV", visualSize: 20 },
+      { name: "Ab", spec: "F1 V", visualSize: 22 },
+    ],
+    sources: [
+      "https://en.wikipedia.org/wiki/Algol",
+      "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Algol",
+    ],
+    notes:
+      "Triple system: Algol Aa1+Aa2 form the close eclipsing binary; Algol Ab is a third component on a longer orbit. The system defines the 'Algol-type' eclipsing variables — see sources.",
   },
   {
     name: "Schedar",
