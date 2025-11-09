@@ -27,51 +27,76 @@
     tbody td {
       vertical-align: top;
     }
+
+    /* Compact table styling for mobile */
+    @media (max-width: 640px) {
+
+      #starTable th,
+      #starTable td {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.7rem;
+      }
+
+      /* Hide Notes column on mobile (last column - #14) */
+      #starTable th:nth-child(14),
+      #starTable td:nth-child(14) {
+        display: none;
+      }
+    }
   </style>
 </head>
 
 <body class="bg-slate-50 text-slate-900">
-  <main class="max-w-full mx-auto p-6 w-full">
-    <header class="mb-6">
-      <h1 class="text-3xl font-bold">Interactive Star Catalog — <span id="star-count">0</span> Bright Stars</h1>
-      <p class="text-slate-600 mt-2">Click a column header to sort. Use the checkboxes to include stars visible from the
-        Northern and/or Southern sky. Values are approximate, rounded; luminosity in solar units (L☉), radius in solar
-        radii (R☉), mass in solar masses (M☉), age in billions of years (Gyr).</p>
-    </header>
+  <main class="max-w-full mx-auto p-3 sm:p-6 w-full">
+    <!-- Toggle button for mobile -->
+    <button id="toggleControls" class="mb-3 px-4 py-2 bg-slate-800 text-white rounded-lg sm:hidden w-full font-medium">
+      ▼ Show Filters & Info
+    </button>
 
-    <!-- Controls -->
-    <section class="mb-4 grid gap-3 md:grid-cols-4">
-      <label class="inline-flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-white shadow-sm">
-        <input type="checkbox" id="chkNorth" class="h-4 w-4" checked>
-        <span class="text-sm font-medium">Include Northern-sky stars</span>
-      </label>
-      <label class="inline-flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-white shadow-sm">
-        <input type="checkbox" id="chkSouth" class="h-4 w-4" checked>
-        <span class="text-sm font-medium">Include Southern-sky stars</span>
-      </label>
-      <label class="block">
-        <span class="text-sm font-medium">Search (name / constellation / notes)</span>
-        <input id="q" type="search" placeholder="e.g., Vega, giant, debris disk"
-          class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 shadow-sm" />
-      </label>
-      <label class="block">
-        <span class="text-sm font-medium">Filter by spectral type</span>
-        <select id="spectralFilter" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 shadow-sm">
-          <option value="">All</option>
-          <option>A</option>
-          <option>F</option>
-          <option>G</option>
-          <option>K</option>
-          <option>M</option>
-          <option>B</option>
-          <option>O</option>
-        </select>
-      </label>
-    </section>
+    <div id="collapsibleSection">
+      <header class="mb-4 sm:mb-6">
+        <h1 class="text-2xl sm:text-3xl font-bold">Interactive Star Catalog — <span id="star-count">0</span> Bright
+          Stars</h1>
+        <p class="text-slate-600 mt-2 text-sm sm:text-base">Click a column header to sort. Use the checkboxes to include
+          stars visible from the
+          Northern and/or Southern sky. Values are approximate, rounded; luminosity in solar units (L☉), radius in solar
+          radii (R☉), mass in solar masses (M☉), age in billions of years (Gyr).</p>
+      </header>
+
+      <!-- Controls -->
+      <section class="mb-4 grid gap-3 md:grid-cols-4">
+        <label class="inline-flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-white shadow-sm">
+          <input type="checkbox" id="chkNorth" class="h-4 w-4" checked>
+          <span class="text-sm font-medium">Include Northern-sky stars</span>
+        </label>
+        <label class="inline-flex items-center gap-2 p-2 rounded-xl border border-slate-200 bg-white shadow-sm">
+          <input type="checkbox" id="chkSouth" class="h-4 w-4" checked>
+          <span class="text-sm font-medium">Include Southern-sky stars</span>
+        </label>
+        <label class="block">
+          <span class="text-sm font-medium">Search (name / constellation / notes)</span>
+          <input id="q" type="search" placeholder="e.g., Vega, giant, debris disk"
+            class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 shadow-sm" />
+        </label>
+        <label class="block">
+          <span class="text-sm font-medium">Filter by spectral type</span>
+          <select id="spectralFilter" class="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 shadow-sm">
+            <option value="">All</option>
+            <option>A</option>
+            <option>F</option>
+            <option>G</option>
+            <option>K</option>
+            <option>M</option>
+            <option>B</option>
+            <option>O</option>
+          </select>
+        </label>
+      </section>
+    </div>
 
     <!-- Table -->
-    <div class="overflow-x-auto xl:overflow-visible rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <table class="w-full xl:table-auto text-sm" id="starTable">
+    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <table class="w-full text-xs sm:text-sm" id="starTable">
         <thead class="bg-slate-100">
           <tr>
             <th class="p-3"><button data-key="name" class="font-semibold">Name<span class="sort-ind"></span></button>
@@ -111,7 +136,8 @@
       </table>
     </div>
 
-    <p class="text-xs text-slate-500 mt-3">Approximate data assembled for educational use. "Visibility" denotes which
+    <p class="text-xs text-slate-500 mt-3 px-1">Approximate data assembled for educational use. "Visibility" denotes
+      which
       hemisphere(s) the star is readily observable from: <em>Northern</em>, <em>Southern</em>, or <em>Both</em>.</p>
   </main>
 
@@ -494,6 +520,21 @@
     });
 
     [q, chkNorth, chkSouth, spectralFilter].forEach(el => el.addEventListener('input', render))
+
+    // Toggle controls section (mobile only)
+    const toggleBtn = document.getElementById('toggleControls')
+    const collapsibleSection = document.getElementById('collapsibleSection')
+    if (toggleBtn && collapsibleSection) {
+      toggleBtn.addEventListener('click', () => {
+        const isHidden = collapsibleSection.style.display === 'none'
+        collapsibleSection.style.display = isHidden ? 'block' : 'none'
+        toggleBtn.textContent = isHidden ? '▲ Hide Filters & Info' : '▼ Show Filters & Info'
+      })
+      // Start collapsed on mobile
+      if (window.innerWidth < 640) {
+        collapsibleSection.style.display = 'none'
+      }
+    }
 
     // Initial render
     render();
