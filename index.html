@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Interactive Star Catalog — 50 Bright Stars</title>
+  <title>Interactive Star Catalog — Brightest Stars</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -28,7 +28,7 @@
 <body class="bg-slate-50 text-slate-900">
   <main class="max-w-7xl xl:max-w-screen-2xl mx-auto p-6 w-full">
     <header class="mb-6">
-      <h1 class="text-3xl font-bold">Interactive Star Catalog — 50 Bright Stars</h1>
+      <h1 class="text-3xl font-bold">Interactive Star Catalog — <span id="star-count">0</span> Bright Stars</h1>
       <p class="text-slate-600 mt-2">Click a column header to sort. Use the checkboxes to include stars visible from the
         Northern and/or Southern sky. Values are approximate, rounded; luminosity in solar units (L☉), radius in solar
         radii (R☉), mass in solar masses (M☉), age in billions of years (Gyr).</p>
@@ -277,6 +277,18 @@
       // otherwise keep the author-provided `starType` exactly as given
     })
 
+    // Update the page title and header with the current number of stars in the
+    // dataset. This reads the global `stars` array (loaded from `stars-data.js`).
+    function updateStarCount() {
+      const n = Array.isArray(stars) ? stars.length : 0
+      const el = document.getElementById('star-count')
+      if (el) el.textContent = String(n)
+      document.title = `Interactive Star Catalog — ${n} Brightest Stars`
+    }
+
+    // Set initial count immediately after dataset processing.
+    updateStarCount()
+
     function visibleFilter(s) {
       const north = chkNorth.checked
       const south = chkSouth.checked
@@ -405,7 +417,20 @@
           <td class="p-3 text-right">${formatNum(s.mass)}</td>
           <td class="p-3 text-right">${formatNum(s.age)}</td>
           <td class="p-3">${s.spectral}</td>
-          <td class="p-3">${s.starType}</td>
+          <td class="p-3">${(() => {
+            // If the system provides a `components` array, list each
+            // component's spectral/type string so users can see the
+            // composition at a glance. Otherwise fall back to the
+            // author-provided `starType`.
+            if (Array.isArray(s.components) && s.components.length) {
+              return s.components.map(c => {
+                if (typeof c === 'string') return c
+                // prefer an explicit spec, otherwise the component name
+                return (c.spec && c.spec.toString()) || (c.name && c.name.toString()) || '—'
+              }).join(', ')
+            }
+            return s.starType || '—'
+          })()}</td>
           <!-- Exoplanet count column removed; include planet info inside Notes popup below -->
           <td class="p-3" style="min-width:20rem;">
             <div class="relative inline-block group" tabindex="0">
@@ -434,6 +459,9 @@
         </tr>
       `}).join('')
       updateSortIndicators()
+      // Keep the header/title in sync with the dataset each time we render
+      // (useful if the stars array is modified programmatically at runtime).
+      if (typeof updateStarCount === 'function') updateStarCount()
     }
 
     function updateSortIndicators() {
